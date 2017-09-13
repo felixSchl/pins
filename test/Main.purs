@@ -70,17 +70,8 @@ main = run [consoleReporter] do
       replicateM 10 (liftEff $ mkPins 4 10) >>= traverse_ \pins -> do
         length pins `shouldEqual` 10
         for_ pins \pin -> do
-          let xs = fromFoldable $ S.split (wrap "") pin
-          length xs `shouldEqual` 4
-
-          ys <- for xs \x ->
-            case Int.fromString x of
-              Just v -> pure v
-              Nothing -> liftEff do
-                throwException $ error $ "invalid pin member: " <> show x
-
-          when (hasIncConsecElems 3 ys) $ liftEff do
+          length pin `shouldEqual` 4
+          when (hasIncConsecElems 3 pin) $ liftEff do
              throwException $ error $ "detected consecutive incrementing integer"
-
-          when (hasConsecElems 2 ys) $ liftEff do
+          when (hasConsecElems 2 pin) $ liftEff do
              throwException $ error $ "detected consecutive equal integers"
